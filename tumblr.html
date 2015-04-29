@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1">
+	<title>catchpics</title>
+	<style>
+		ul{
+			list-style: none;
+			overflow: hidden;
+			padding-left: 0;
+		}
+		.fl{
+			float: left;
+		}
+		.fr{
+			float: right;
+		}
+		.pics{
+			width: 100%;
+		}
+		.pics li{
+				float: left;
+				margin-right: 10px;
+				width: 200px;
+		}
+		.pics li img{
+			width:100%;
+
+		}	
+		.search{
+			border: 1px solid orange;
+			width: 300px;
+			margin: 0 auto;
+			height: 40px;
+			line-height: 40px;
+		}
+		.search input{
+			float: left;
+			border: 0;
+			height: 34px;
+			line-height: 34px;
+			width: 70%;
+		}
+		.btn{
+			float: right;
+			background-color: orange;
+			color: #fff;
+			text-decoration: none;
+			width: 25%;
+			text-align: center;
+			cursor: pointer;
+		}
+		.page-wrap{
+			width: 300px;
+			margin: 0 auto;
+		}
+		.page{
+			/*width: 300px;*/
+			
+
+
+		}
+		.page li{
+			float: left;
+			padding: 4px;
+			background-color: orange;
+			margin-right: 10px;
+
+		}
+		.page li.active {
+			background-color: #FF6622;
+		}
+		.page li a{
+			color: #fff;
+			padding: 4px 6px;
+			text-decoration: none;
+		}
+		.jumppage{
+			width: 300px;
+			margin: 0 auto;
+		}
+		.jpage{
+			width: 160px;
+            border: 1px solid orange;
+            height:30px;
+            -webkit-appearance:none;
+            border-radius: 0;
+		}
+		.jbtn{
+			padding: 8px 0;
+		}
+
+	/*loading part*/
+	.spinner {
+	  margin: 100px auto 0;
+	  width: 150px;
+	  text-align: center;
+	  display: none;
+	}
+	 
+	.spinner > div {
+	  width: 30px;
+	  height: 30px;
+	  background-color: #67CF22;
+	 
+	  border-radius: 100%;
+	  display: inline-block;
+	  -webkit-animation: bouncedelay 1.4s infinite ease-in-out;
+	  animation: bouncedelay 1.4s infinite ease-in-out;
+	  /* Prevent first frame from flickering when animation starts */
+	  -webkit-animation-fill-mode: both;
+	  animation-fill-mode: both;
+	}
+	 
+	.spinner .bounce1 {
+	  -webkit-animation-delay: -0.32s;
+	  animation-delay: -0.32s;
+	}
+	 
+	.spinner .bounce2 {
+	  -webkit-animation-delay: -0.16s;
+	  animation-delay: -0.16s;
+	}
+	 
+	@-webkit-keyframes bouncedelay {
+	  0%, 80%, 100% { -webkit-transform: scale(0.0) }
+	  40% { -webkit-transform: scale(1.0) }
+	}
+	 
+	@keyframes bouncedelay {
+	  0%, 80%, 100% {
+	    transform: scale(0.0);
+	    -webkit-transform: scale(0.0);
+	  } 40% {
+	    transform: scale(1.0);
+	    -webkit-transform: scale(1.0);
+	  }
+	}
+	@media screen and (max-width: 360px) { 
+		.pics li{
+				float: left;
+				margin-right: 2%;
+				width: 48%;
+		}
+		.search{
+			width: 100%;
+		}
+	}
+
+	</style>
+
+</head>
+<body>
+<div class="search">
+	<input type="text" id='word' placeholder='输入博客名'>
+	<a href="javascript:void(0);" class="btn" id='ser-btn'>搜索</a>
+</div>
+<!-- loading part -->
+<div class="spinner" id="spinner">
+  <div class="bounce1"></div>
+  <div class="bounce2"></div>
+  <div class="bounce3"></div>
+</div>
+<div class="pics-wrap">
+	<ul id="pics" class='pics'>
+	</ul>	
+</div>
+<div class="page-wrap">
+	<ul id="page" class='page'>
+	</ul>
+
+</div>
+
+<div class="jumppage">
+	<input type="text" id='jpage' class='jpage' value=''>
+	<a class="btn jbtn" id='jbtn'>跳转</a>	
+	<div >
+		共<span id="total"></span>页
+	</div>		
+</div>
+
+
+<!-- <script src="jquery-1.10.2.min.js"></script> -->
+<script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+
+<script>
+	$(function(){
+		getHash();
+	    // getData('beatricecerocchi');
+	    $('#ser-btn').on('click',function(){
+	    	var word = $('#word').val();
+	    	// word = encodeURIComponent(word)
+             getData(word);
+            //getHash(word)
+	    }) 	
+	    $('body').on('keyup',function(event){
+	    	event = event || window.event;
+	    	if(event.keyCode==13){
+	    		$('#ser-btn').click();
+	    	}else if(event.keyCode==37){
+	    		$('#p-pre').click();
+	    	}else if(event.keyCode==39){
+	    		$('#p-next').click();
+	    	}
+	    })
+	    
+    }); 
+
+    function getData(word,page){
+    	$('#pics').html('');
+    	$('#spinner').show();
+    	 if(!page){
+    	 	page = 1
+    	 }else{
+    	 	page = page;
+    	 }
+    	
+    	var ser_url = 'http://' + word + '.tumblr.com/api/read/json?callback=json&start=' + parseInt((page-1)*30) + '&num=30&type=photo';
+
+	    $.ajax({
+	        type : "GET",
+	        url: ser_url,
+	        dataType : "jsonp",
+	        cache:false,
+	        jsonp: "callback",//传递给请求处理程序或页面的，用以获得jsonp回调函数名的参数名(默认为:callback)
+	        jsonpCallback:"jsonpcallback",//自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
+	        success : function(data){
+
+	        	var total = data['posts-total'];
+	        	$('#total').html(Math.ceil(total/30))
+
+				var contHtml = '';
+				$.each(data.posts,function(key,val){
+					if(val['photo-url-1280']){
+						contHtml += '<li><a href=' + val['photo-url-1280']+'><img src=' +val['photo-url-100'] + '></a></li>';		
+					}
+				})	
+				$('#pics').html(contHtml);	
+				$('#spinner').hide();	
+				var nowPage = page;			
+	    		getPage(nowPage)
+	    		window.location.hash='#' + '&' +word + '&'+nowPage;
+	    		$('#pics').find('a').attr('target','_blank');
+              
+	        }
+		})    	
+    }
+
+	function jsonpcallback(data){ 
+		 //函数内容用不到，但是需要存在这个函数      
+	} 
+	function getPage(nowPage){
+		var pagenav='';
+		pagenav +='<li class="p-pre" ><a id="p-pre" href="javascript:void(0)">&laquo;</a></li>';
+
+		if(nowPage < 3){
+			if(nowPage == 1){
+				for (var i = 0; i < 5; i++) {
+					if(i == 0){
+						pagenav += '<li class="active"><a href="javascript:void(0)">'+ parseInt(nowPage + i) + '</a></li>';
+					}else{
+						pagenav += '<li><a href="javascript:void(0)">'+ parseInt(nowPage + i) + '</a></li>';
+					}						
+				};				
+			}else{
+				for (var i = 1; i < 6; i++) {
+					if(i == 1){
+						pagenav += '<li><a href="javascript:void(0)">'+ i + '</a></li>'
+					}
+					else if(i == 2){
+						pagenav += '<li class="active"><a href="javascript:void(0)">'+ parseInt(nowPage) + '</a></li>';
+					}else{
+						pagenav += '<li><a href="javascript:void(0)">'+ i + '</a></li>';
+					}						
+				};					
+			}
+	
+		}else{
+			for (var i = -2; i <3; i++) {
+				if(i == 0){
+					pagenav += '<li class="active"><a href="javascript:void(0)">'+ parseInt(nowPage + i) + '</a></li>';
+				}else{
+					pagenav += '<li><a href="javascript:void(0)">'+ parseInt(nowPage + i) + '</a></li>';
+				}						
+			};			
+		}							
+		pagenav +='<li class="p-next"><a  id="p-next" href="javascript:void(0)">&raquo;</a></li>';
+		$('#page').html(pagenav); 
+
+		$('#page').find('a').on('click',function(){
+			if($(this).parent().hasClass('p-pre')){
+				nowPage = nowPage -1 ;
+				console.log(nowPage);
+				$('#jpage').val(nowPage)
+			}else if($(this).parent().hasClass('p-next')){
+				nowPage = nowPage +1 ;
+				console.log(nowPage);
+				$('#jpage').val(nowPage)
+			}else{
+				$(this).parent().addClass('active').siblings().removeClass('active');
+				nowPage = parseInt($(this).html());
+				console.log(nowPage);
+				$('#jpage').val(nowPage)
+			}
+	    	var word = $('#word').val();
+	    	if(!word){
+	    		word = 'beatricecerocchi';
+	    	}
+	    	// word = encodeURIComponent(word);
+			getData(word,nowPage);
+		})
+		$('#jbtn').on('click',function(){
+			var page = parseInt($('#jpage').val());
+			var urlData = window.location.hash.split("&");
+		
+
+			var word = urlData[1];            
+			getData(word,page);
+	
+		})	
+        
+     
+
+	} 
+	function getHash(word){
+		var urlData = window.location.hash.split("&");
+		
+
+		var word = urlData[1];
+		if(!word){
+			word = $('#word').val();
+			if(!word){
+				return false;
+			}
+		}
+		var page = urlData[2];
+    	if(!page){
+    		page = 1
+    	}else{
+    		page = page;
+    	}	
+    	page = parseInt(page);	
+    	getData(word,page);				
+
+
+	}    	
+</script>	
+</body>
+</html>
