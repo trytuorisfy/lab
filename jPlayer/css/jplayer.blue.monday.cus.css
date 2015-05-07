@@ -375,7 +375,7 @@ content: "\e608";
 .jp-details,
 .jp-playlist {
   width: 100%;
-  background: #2A0527 url(../image/bg.jpg) 0 0 no-repeat;
+  background: #2A0527 url(http://nuomixin.qiniudn.com/music-bg.jpg) 0 0 no-repeat;
   border-top: 1px solid #370F58; }
 
 .jp-type-single .jp-details,
