@@ -182,7 +182,7 @@
 
 
 <!-- <script src="jquery-1.10.2.min.js"></script> -->
-<script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+<script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
 
 <script>
 	$(function(){
@@ -233,7 +233,15 @@
 				var contHtml = '';
 				$.each(data.posts,function(key,val){
 					if(val['photo-url-1280']){
-						contHtml += '<li><a href=' + val['photo-url-1280']+'><img src=' +val['photo-url-100'] + '></a></li>';		
+						if(val['photos'].length > 0){
+							for (var i = 0; i < val['photos'].length; i++) {
+								val['photos'][i]
+								contHtml += '<li><a href=' + val['photos'][i]['photo-url-1280']+'><img src=' +val['photos'][i]['photo-url-100'] + '></a></li>';
+							};
+						}else{
+							contHtml += '<li><a href=' + val['photo-url-1280']+'><img src=' +val['photo-url-100'] + '></a></li>';								
+						}
+	
 					}
 				})	
 				$('#pics').html(contHtml);	
