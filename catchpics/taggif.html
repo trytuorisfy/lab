@@ -16,6 +16,9 @@
 		.fr{
 			float: right;
 		}
+		.mrpct2{
+			margin-right: 2%;
+		}
 		.pics{
 			width: 100%;
 		}
@@ -29,7 +32,6 @@
 
 		}	
 		.search{
-			border: 1px solid orange;
 			width: 300px;
 			margin: 0 auto;
 			height: 40px;
@@ -40,7 +42,10 @@
 			border: 0;
 			height: 34px;
 			line-height: 34px;
-			width: 70%;
+			width: 30%;
+			border: 1px solid orange;
+            -webkit-appearance:none;
+            border-radius: 0;			
 		}
 		.btn{
 			float: right;
@@ -153,9 +158,11 @@
 </head>
 <body>
 <div class="search">
-	<input type="text" id='word' placeholder='输入博客名'>
+	<input type="text" id='word' placeholder='输入博客名' class='mrpct2'>
+	<input type="text" id='tag' placeholder='输入tag'>
 	<a href="javascript:void(0);" class="btn" id='ser-btn'>搜索</a>
 </div>
+
 <!-- loading part -->
 <div class="spinner" id="spinner">
   <div class="bounce1"></div>
@@ -180,7 +187,6 @@
 	</div>		
 </div>
 
-
 <!-- <script src="jquery-1.10.2.min.js"></script> -->
 <script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
 
@@ -190,6 +196,7 @@
 	    // getData('beatricecerocchi');
 	    $('#ser-btn').on('click',function(){
 	    	var word = $('#word').val();
+	    	
 	    	// word = encodeURIComponent(word)
              getData(word);
             //getHash(word)
@@ -203,8 +210,7 @@
 	    	}else if(event.keyCode==39){
 	    		$('#p-next').click();
 	    	}
-	    })
-	    
+	    })	    
     }); 
 
     function getData(word,page){
@@ -215,8 +221,9 @@
     	 }else{
     	 	page = page;
     	 }
-    	
-    	var ser_url = 'http://' + word + '.tumblr.com/api/read/json?callback=json&start=' + parseInt((page-1)*30) + '&num=30&type=photo';
+    	var tag = $('#tag').val();
+    	var per_page = 60;
+    	var ser_url = 'http://' + word + '.tumblr.com/api/read/json?callback=json&start=' + parseInt((page-1)*per_page) + '&num='+ per_page + '&type=photo&tagged=' + tag;
 
 	    $.ajax({
 	        type : "GET",
@@ -228,19 +235,23 @@
 	        success : function(data){
 
 	        	var total = data['posts-total'];
-	        	$('#total').html(Math.ceil(total/30))
+	        	$('#total').html(Math.ceil(total/per_page))
 
 				var contHtml = '';
 				$.each(data.posts,function(key,val){
-					if(val['photo-url-1280']){
-						if(val['photos'].length > 0){
-							for (var i = 0; i < val['photos'].length; i++) {
-								val['photos'][i]
-								contHtml += '<li><a href=' + val['photos'][i]['photo-url-1280']+'><img src=' +val['photos'][i]['photo-url-100'] + '></a></li>';
-							};
-						}else{
-							contHtml += '<li><a href=' + val['photo-url-1280']+'><img src=' +val['photo-url-100'] + '></a></li>';								
+					var photo = val['photo-url-1280'];
+					if(photo){
+						if(photo.substr(photo.length-3).toLowerCase()=='gif'){
+							if(val['photos'].length > 0){
+								for (var i = 0; i < val['photos'].length; i++) {
+									val['photos'][i]
+									contHtml += '<li><a href=' + val['photos'][i]['photo-url-1280']+'><img src=' +val['photos'][i]['photo-url-100'] + '></a></li>';
+								};
+							}else{
+								contHtml += '<li><a href=' + val['photo-url-1280']+'><img src=' +val['photo-url-100'] + '></a></li>';								
+							}							
 						}
+
 	
 					}
 				})	
@@ -248,7 +259,7 @@
 				$('#spinner').hide();	
 				var nowPage = page;			
 	    		getPage(nowPage)
-	    		window.location.hash='#' + '&' +word + '&'+nowPage;
+	    		window.location.hash='#' + '&' +word + '&'+nowPage + '&'+tag;
 	    		$('#pics').find('a').attr('target','_blank');
               
 	        }

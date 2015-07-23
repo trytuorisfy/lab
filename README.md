@@ -1,5 +1,8 @@
 # lab
+## jPlayer
+基于[jplayer](http://www.jplayer.org/)的播放器，只是改了样式。
 
-个人倒腾着玩的，请勿使用
+## catchpics
 
-tumblr.html 获取tumblr图片
+个人倒腾着玩的，为了方便看tumblr的图片。
+地址可以戳这里[catchpics](http://catchpics.sinaapp.com/)
